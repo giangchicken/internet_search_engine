@@ -17,15 +17,28 @@ if __name__ == "__main__":
     # Lấy danh sách nghị định và nội dung
     NDS = df["Nghị định số"].tolist()
     Content = df["Nội dung"].tolist()
-    active_date = df["Ngày hiệu lực"].tolist()
+    active_date = df["Ngày hiệu lực"].astype(str).tolist()
 
     # Thư mục lưu HTML và mapping
     save_dir = "html_pages"
     mapping_filename = "mapping.json"
+    mapping_path = os.path.join(save_dir, mapping_filename)
+
+    # Tải mapping nếu có sẵn
+    if os.path.exists(mapping_path):
+        with open(mapping_path, "r", encoding="utf-8") as mf:
+            mapping = json.load(mf)
+    else:
+        mapping = {}
 
     # Duyệt từng nghị định
     for idx, (nd, content, date) in enumerate(zip(NDS, Content, active_date)):
         print(f"\n🔍 Đang xử lý: {nd} - {content[:50]}...")
+
+        already_done = any(nd in k or k.endswith(f"{nd}.aspx") for k in mapping.keys())
+        if already_done:
+            print(f"⏭️ Bỏ qua {nd} vì đã có trong mapping.")
+            continue
 
         try:
             # Tìm kiếm Google
