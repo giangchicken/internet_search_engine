@@ -4,6 +4,7 @@ import pandas as pd
 import os
 import json
 import time
+import random
 
 if __name__ == "__main__":
     # Đọc file Excel chứa danh sách nghị định
@@ -31,26 +32,28 @@ if __name__ == "__main__":
     else:
         mapping = {}
 
+    print(mapping)
     # Duyệt từng nghị định
     for idx, (nd, content, date) in enumerate(zip(NDS, Content, active_date)):
         print(f"\n🔍 Đang xử lý: {nd} - {content[:50]}...")
 
-        already_done = any(nd in k or k.endswith(f"{nd}.aspx") for k in mapping.keys())
-        if already_done:
-            print(f"⏭️ Bỏ qua {nd} vì đã có trong mapping.")
-            continue
 
         try:
             # Tìm kiếm Google
             deal, urls = fetch_search_results(deal=nd, context=content, num_results=5, lang="vi")
             thuvienphapluat_urls = [url for url in urls if "thuvienphapluat" in url]
 
+            time.sleep(random.uniform(5, 10))
+
             if not thuvienphapluat_urls:
                 print("⚠️ Không tìm thấy URL thuvienphapluat.")
                 print(urls)
                 continue
             
-            
+            already_done = any(thuvienphapluat_urls[0] in k or k.endswith(f"{nd}.aspx") for k in mapping.keys())
+            if already_done:
+                print(f"⏭️ Bỏ qua {nd} vì đã có trong mapping.")
+                continue
 
             # Tải URL đầu tiên thỏa mãn
             index_url_tuple = (idx, thuvienphapluat_urls[0])

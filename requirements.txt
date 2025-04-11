@@ -4,3 +4,5 @@ googlesearch-python
 beautifulsoup4
 requests
 tldextract
+pandas
+openpyxl
